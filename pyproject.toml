@@ -1,0 +1,11 @@
+[tool.black]
+line-length = 119
+target-version = ['py37']
+
+[tool.ruff]
+line-length = 88
+lint.select = ["E", "F", "W", "C90"]
+lint.ignore = ["E203"]  # Removed W503, as it might be unsupported
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2

@@ -1,2 +1,2 @@
 # code-agent
-Simple code agent for fast prototyping
+Simple code agent designed for fast prototyping
