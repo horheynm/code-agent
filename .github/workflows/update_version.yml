@@ -1,0 +1,108 @@
+name: Update Version
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - created
+
+jobs:
+  update-alpha-version:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Update alpha version
+        run: |
+          # Read the current version
+          VERSION=$(cat VERSION)
+          
+          # Extract the base version and alpha suffix
+          BASE_VERSION=$(echo $VERSION | sed -E 's/a[0-9]+//')
+          ALPHA_SUFFIX=$(echo $VERSION | grep -oE 'a[0-9]+' | sed 's/a//')
+          
+          # Increment the alpha suffix, initialize to 0 if not present
+          if [ -z "$ALPHA_SUFFIX" ]; then
+            NEW_ALPHA_SUFFIX=0
+          else
+            NEW_ALPHA_SUFFIX=$((ALPHA_SUFFIX + 1))
+          fi
+          
+          # Construct the new version
+          NEW_VERSION="${BASE_VERSION}a${NEW_ALPHA_SUFFIX}"
+          
+          # Update the VERSION file
+          echo $NEW_VERSION > VERSION
+          
+          # Configure git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Commit and push the changes
+          git add VERSION
+          git commit -m "Increment alpha version to ${NEW_VERSION}"
+          git push origin main
+
+  update-patch-version:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    env:
+      IS_RELEASE: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Update patch version
+        run: |
+          # Read the current version
+          VERSION=$(cat VERSION)
+          
+          # Extract the major, minor, and patch parts
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3 | sed -E 's/a[0-9]+//')
+          
+          # Increment the patch version
+          NEW_PATCH=$((PATCH + 1))
+          
+          # Construct the new version
+          NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}a0"
+          
+          # Update the VERSION file
+          echo $NEW_VERSION > VERSION
+          
+          # Configure git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Commit and push the changes
+          git add VERSION
+          git commit -m "Increment patch version to ${NEW_VERSION}"
+          git push origin main
+
+      - name: Build and upload package to PyPI
+        env:
+          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD }}
+        run: |
+          # Install build tools
+          python -m pip install --upgrade pip
+          pip install setuptools wheel twine
+          
+          # Build the package
+          make build
+          
+          # Upload the package to PyPI
+          twine upload dist/*
+
+      - name: Upload new version file
+        uses: actions/upload-artifact@v2
+        with:
+          name: new-version
+          path: VERSION
