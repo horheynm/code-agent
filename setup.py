@@ -21,7 +21,7 @@ def get_package_name():
 
 required_packages = [
     "openai==1.35.7",
-    "pydantic==2.7.3",
+    "pydantic==2.7.4",
 ]
 
 extra_reqs = {
