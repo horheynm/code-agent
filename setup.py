@@ -44,4 +44,5 @@ setup(
     packages=find_packages("src", include=["small_agent"]),
     install_requires=required_packages,
     extras_require=extra_reqs,
+    url="https://github.com/horheynm/small-agent"
 )
