@@ -41,7 +41,7 @@ setup(
     license="Apache 2.0",
     description="Code generation LLM agent for fast prototyping",
     package_dir={"": "src"},
-    packages=find_packages("src", include=["code_agent"]),
+    packages=find_packages("src", include=["small_agent"]),
     install_requires=required_packages,
     extras_require=extra_reqs,
 )

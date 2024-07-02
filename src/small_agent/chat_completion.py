@@ -6,7 +6,12 @@ class ChatCompletion:
     def __init__(self, openai_key: str) -> None:
         self.client = OpenAI(api_key=openai_key)
 
-    def generate(self, stream: bool, model: str = "gpt-3.5-turbo", **kwargs: Any) -> Any:
+    def generate(
+        self,
+        stream: bool,
+        model: str = "gpt-3.5-turbo",
+        **kwargs: Any,
+    ) -> Any:
         if stream:
             return self.make_stream_request(model=model, **kwargs)
         else:

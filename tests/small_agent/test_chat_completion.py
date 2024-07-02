@@ -1,13 +1,13 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from code_agent.chat_completion import (
+from small_agent.chat_completion import (
     ChatCompletion,
 )  # Adjust the import to the correct module path
 
 
 class TestChatCompletion(unittest.TestCase):
 
-    @patch("code_agent.chat_completion.OpenAI")
+    @patch("small_agent.chat_completion.OpenAI")
     def setUp(self, MockOpenAI):
         self.mock_client = MockOpenAI.return_value
         self.chat_completion = ChatCompletion(openai_key="test_key")
@@ -18,7 +18,11 @@ class TestChatCompletion(unittest.TestCase):
             choices=[MagicMock(message=MagicMock(content="Hi there!"))]
         )
 
-        result = self.chat_completion.generate(stream=False, model="gpt-3.5-turbo", messages=messages)
+        result = self.chat_completion.generate(
+            stream=False,
+            model="gpt-3.5-turbo",
+            messages=messages,
+        )
 
         self.mock_client.chat.completions.create.assert_called_once_with(
             model="gpt-3.5-turbo", stream=False, messages=messages
@@ -33,7 +37,13 @@ class TestChatCompletion(unittest.TestCase):
 
         self.mock_client.chat.completions.create.return_value = response_mock
 
-        result = list(self.chat_completion.generate(stream=True, model="gpt-3.5-turbo", messages=messages))
+        result = list(
+            self.chat_completion.generate(
+                stream=True,
+                model="gpt-3.5-turbo",
+                messages=messages,
+            )
+        )
 
         self.mock_client.chat.completions.create.assert_called_once_with(
             model="gpt-3.5-turbo", stream=True, messages=messages
@@ -46,7 +56,10 @@ class TestChatCompletion(unittest.TestCase):
             choices=[MagicMock(message=MagicMock(content="Hi there!"))]
         )
 
-        result = self.chat_completion.make_request(model="gpt-3.5-turbo", messages=messages)
+        result = self.chat_completion.make_request(
+            model="gpt-3.5-turbo",
+            messages=messages,
+        )
 
         self.mock_client.chat.completions.create.assert_called_once_with(
             model="gpt-3.5-turbo", stream=False, messages=messages
@@ -61,7 +74,12 @@ class TestChatCompletion(unittest.TestCase):
 
         self.mock_client.chat.completions.create.return_value = response_mock
 
-        result = list(self.chat_completion.make_stream_request(model="gpt-3.5-turbo", messages=messages))
+        result = list(
+            self.chat_completion.make_stream_request(
+                model="gpt-3.5-turbo",
+                messages=messages,
+            )
+        )
 
         self.mock_client.chat.completions.create.assert_called_once_with(
             model="gpt-3.5-turbo", stream=True, messages=messages
